@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
-# A script that Configures Nginx to redirect requests
+# Configures an Nginx server so that /redirect_me redirects to another page.
+# The redirection is configured as a "301 Moved Permanently"
 
-# Update package lists
-sudo apt-get update
+apt-get update
+apt-get install -y nginx
 
-# Install Nginx
-sudo apt-get install -y nginx
+mkdir /etc/nginx/html
+touch /etc/nginx/html/index.html
+echo "Hello World!" > /etc/nginx/html/index.html
+printf %s "server {
+    listen 80;
+    listen [::]:80 default_server;
+    root   /etc/nginx/html;
+    index  index.html index.htm;
+    location /redirect_me {
+        return 301 http://cuberule.com/;
+    }
+}" > /etc/nginx/sites-available/default
 
-# Configure Nginx to redirect requests
-sudo sed -i '/server_name _;/a \\n    location /redirect_me {\n        return 301 http://example.com/newpage;\n    }' /etc/nginx/sites-available/default
-
-# Test Nginx configuration
-sudo nginx -t
-
-# Reload Nginx to apply changes
-sudo service nginx reload
+service nginx restart
