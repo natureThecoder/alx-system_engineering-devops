@@ -4,10 +4,11 @@
 exec { 'fix--for-nginx':
   command => 'sed -i "s/15/4096/" /etc/default/nginx',
   path    => '/usr/local/bin/:/bin/'
-} ->
+  onlyif  => 'grep -q "^ULIMIT=4096" /etc/default/nginx',
+} 
 
 # Restart Nginx
 exec { 'nginx-restart':
-  command => 'nginx restart',
-  path    => '/etc/init.d/'
+  command => '/etc/init.d/nginx restart',
+  refreshonly => true,
 }
